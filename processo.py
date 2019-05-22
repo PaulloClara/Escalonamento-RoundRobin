@@ -6,6 +6,7 @@ class Processo(object):
     self.__processado = 0
     self.__ativo = False
     self.__finalizado = False
+    self.__historico = []
 
   def status(self):
     msg = 'Pronto'
@@ -16,17 +17,18 @@ class Processo(object):
       msg = 'Não Alocado'
     return msg
 
-  def run(self, quantum):
-    resto = self.__processado + quantum - self.__necessario
-    if resto >= 0:
-      self.__processado += quantum - resto
-      return resto
-    else:
-      self.__processado += quantum
-      return 0
+  def run(self):
+    self.__processado += 1
+    self.registrar('Executando')
+
+  def registrar(self, estado='Finalizado'):
+    self.__historico.append(estado)
 
   def entrarNaMemoria(self):
     self.__ativo = True
+
+  def obterHistorico(self):
+    return self.__historico
 
   def obterInicio(self):
     return self.__inicio
@@ -34,10 +36,20 @@ class Processo(object):
   def obterTitulo(self):
     return self.__titulo
 
+  def obterEstado(self):
+    return self.__ativo
+
   def obterProcessado(self):
     return self.__processado
 
+  def obterTempoNecessario(self):
+    return self.__necessario
+
   def init(self):
-    self.__titulo = input('\n\tTitulo do processo\n> ')
-    self.__inicio = int(input('\n\tEm qual tempo ele ira entrar na memoria?\n> '))
-    self.__necessario = int(input('\n\tTempo necessario\n> '))
+    print('\n\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    self.__titulo = input('\tTitulo do processo\n\t> ')
+    self.__inicio = int(input('\n\tEm qual tempo ele ira entrar na memoria?\n\t> '))
+    self.__necessario = int(input('\n\tTempo necessario\n\t> '))
+    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    for fatia in range(self.__inicio):
+      self.registrar('Não alocado')
