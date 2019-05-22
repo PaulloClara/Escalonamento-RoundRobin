@@ -23,8 +23,8 @@ class App(object):
         continue
       self.fatiasUsadas = 0
       self.executarAcao()
-
-    self.mostrarGrafico()
+    self.mostrarTabela()
+    self.mostrarResultados()
 
   def verificarListaDeExecucao(self):
     for index in range(len(self.filaDeProcessos)):
@@ -80,11 +80,38 @@ class App(object):
       print(f'Faltando -> {faltando} | ', end='')
       print(f'Status -> {processo.status()}')
 
-  def mostrarGrafico(self):
+  def mostrarTabela(self):
+    print('\n\n')
+    cores = {
+              'Executando': '\033[1;41m',
+              'Pronto': '\033[1;42m',
+              'Não alocado': '\033[1;100m'
+            }
+    if self.totalDeFatias < 15:
+      tamanhoDaFatia = 5 * ' '
+    elif self.totalDeFatias < 25:
+      tamanhoDaFatia = 3 * ' '
+    else:
+      tamanhoDaFatia = 2 * ' '
     for processo in self.filaDeProcessos:
-      print('')
-      print(processo.obterTitulo())
-      print(processo.obterHistorico())
+      print(f'\t\t{processo.obterTitulo()} -> ', end='\033[0;0m')
+      for fatia in processo.obterHistorico():
+        print(f'|{cores[fatia]}{tamanhoDaFatia}', end='\033[0;0m')
+      print('\n')
+
+  def mostrarResultados(self):
+    tempoMedioDeExecucao = 0
+    tempoMedioDeEspera = 0
+    for processo in self.filaDeProcessos:
+      tempoMedioDeExecucao += len(processo.obterHistorico()) - processo.obterInicio()
+      tempoMedioDeEspera += len(processo.obterHistorico()) - processo.obterInicio()
+      tempoMedioDeEspera -= processo.obterTempoNecessario()
+    tempoMedioDeExecucao /= len(self.filaDeProcessos)
+    tempoMedioDeEspera /= len(self.filaDeProcessos)
+    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    print(f'\tTempo médio de execução -> {tempoMedioDeExecucao} fatias')
+    print(f'\tTempo médio de espera   -> {tempoMedioDeEspera} fatias', end='')
+    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n')
 
 
 if __name__ == '__main__':
