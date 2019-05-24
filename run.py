@@ -10,6 +10,7 @@ class App(object):
     self.filaDeExecucao = []
     self.linhaDoTempo = 0
     self.acao = ''
+    self.cores = {'Executando': '\033[1;41m', 'Pronto': '\033[1;42m', 'Não alocado': '\033[1;100m'}
 
   def run(self):
     self.obterQuantum()
@@ -23,8 +24,8 @@ class App(object):
         continue
       self.fatiasUsadas = 0
       self.executarAcao()
-    self.mostrarTabela()
     self.mostrarResultados()
+    self.mostrarTabela()
 
   def verificarListaDeExecucao(self):
     for index in range(len(self.filaDeProcessos)):
@@ -81,12 +82,6 @@ class App(object):
       print(f'Status -> {processo.status()}')
 
   def mostrarTabela(self):
-    print('\n\n')
-    cores = {
-              'Executando': '\033[1;41m',
-              'Pronto': '\033[1;42m',
-              'Não alocado': '\033[1;100m'
-            }
     if self.totalDeFatias < 15:
       tamanhoDaFatia = 5 * ' '
     elif self.totalDeFatias < 25:
@@ -95,22 +90,29 @@ class App(object):
       tamanhoDaFatia = 2 * ' '
     for processo in self.filaDeProcessos:
       print(f'\t\t{processo.obterTitulo()} -> ', end='\033[0;0m')
-      for fatia in processo.obterHistorico():
-        print(f'|{cores[fatia]}{tamanhoDaFatia}', end='\033[0;0m')
+      for estado in processo.obterHistorico():
+        print(f'|{self.cores[estado]}{tamanhoDaFatia}', end='\033[0;0m')
       print('\n')
+    print('\n\n')
 
   def mostrarResultados(self):
     tempoMedioDeExecucao = 0
     tempoMedioDeEspera = 0
+    print('\n\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=')
     for processo in self.filaDeProcessos:
-      tempoMedioDeExecucao += len(processo.obterHistorico()) - processo.obterInicio()
-      tempoMedioDeEspera += len(processo.obterHistorico()) - processo.obterInicio()
-      tempoMedioDeEspera -= processo.obterTempoNecessario()
+      tempoDeExecucao = len(processo.obterHistorico()) - processo.obterInicio()
+      tempoDeEspera = tempoDeExecucao - processo.obterTempoNecessario()
+      tempoMedioDeExecucao += tempoDeExecucao
+      tempoMedioDeEspera += tempoDeEspera
+      print(f'\tResultados do processo {processo.obterTitulo()}')
+      print(f'\t  Tempo de execução -> {tempoDeExecucao}')
+      print(f'\t  Tempo de espera -> {tempoDeEspera}')
+      print('\t=-=-=-=-=-=-=-=-=-=-=-=-=-=')
     tempoMedioDeExecucao /= len(self.filaDeProcessos)
     tempoMedioDeEspera /= len(self.filaDeProcessos)
     print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    print(f'\tTempo médio de execução -> {tempoMedioDeExecucao} fatias')
-    print(f'\tTempo médio de espera   -> {tempoMedioDeEspera} fatias', end='')
+    print(f'\tTempo médio de execução -> {tempoMedioDeExecucao :4} fatias')
+    print(f'\tTempo médio de espera   -> {tempoMedioDeEspera :4} fatias', end='')
     print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n')
 
 
