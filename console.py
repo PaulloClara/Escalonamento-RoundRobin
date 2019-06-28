@@ -3,7 +3,7 @@ class Console(object):
     pass
 
   def obter(self, msg, tipo=''):
-    valor = input(f'\t\t\t{msg}\n\t\t> ')
+    valor = input(f'\t\t{msg}\n\t\t> ')
     self.quebraDeLinha()
     if tipo == 'int':
       return int(valor)
