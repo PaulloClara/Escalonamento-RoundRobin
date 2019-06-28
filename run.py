@@ -1,14 +1,16 @@
+from console import Console
 from processo import Processo
 
 
 class App(object):
   def __init__(self):
+    self.console = Console()
     self.quantum = 0
+    self.linhaDoTempo = 0
     self.fatiasUsadas = 0
     self.totalDeFatias = 0
-    self.filaDeProcessos = []
     self.filaDeExecucao = []
-    self.linhaDoTempo = 0
+    self.filaDeProcessos = []
     self.acao = ''
     self.cores = {'Executando': '\033[1;41m', 'Pronto': '\033[1;42m', 'Não alocado': '\033[1;100m'}
 
@@ -25,7 +27,9 @@ class App(object):
       self.fatiasUsadas = 0
       self.executarAcao()
     self.mostrarResultados()
+    self.console.quebraDeLinha(3)
     self.mostrarTabela()
+    self.console.quebraDeLinha(3)
 
   def verificarListaDeExecucao(self):
     for index in range(len(self.filaDeProcessos)):
@@ -46,6 +50,7 @@ class App(object):
     self.linhaDoTempo += 1
 
   def executarAcao(self):
+    self.console.quebraDeLinha(2)
     self.mostrarExecucao()
     if self.acao == 'Mover para o fim da fila':
       self.filaDeExecucao.append(self.filaDeExecucao[0])
@@ -58,28 +63,27 @@ class App(object):
       self.filaDeExecucao[index].registrar('Pronto')
 
   def criarListaDeProcessos(self):
-    print('\n\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    numeroDeProcessos = int(input('\tNumero de processos\n\t> '))
-    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    self.console.linha(21)
+    numeroDeProcessos = self.console.obter('Numero de processos', tipo='int')
+    self.console.linha(21)
     for i in range(numeroDeProcessos):
       self.filaDeProcessos.append(Processo())
       self.filaDeProcessos[-1].init()
       self.totalDeFatias += self.filaDeProcessos[-1].obterTempoNecessario()
 
   def obterQuantum(self):
-    print('\n\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    self.quantum = int(input('\tQuanto vale o Quantum?\n\t> '))
-    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    self.console.linha(21)
+    self.quantum = self.console.obter('Quanto vale o Quantum?', tipo='int')
+    self.console.linha(21)
 
   def mostrarExecucao(self):
-    print('\n')
     for index, processo in enumerate(self.filaDeExecucao):
       faltando = processo.obterTempoNecessario() - processo.obterProcessado()
-      print(f'\t{index+1} -> {processo.obterTitulo()} | ', end='')
-      print(f'Necessario -> {processo.obterTempoNecessario()} | ', end='')
-      print(f'Processado -> {processo.obterProcessado()} | ', end='')
-      print(f'Faltando -> {faltando} | ', end='')
-      print(f'Status -> {processo.status()}')
+      self.console.mostrar(f'{index+1} -> {processo.obterTitulo()} | ', n='')
+      self.console.mostrar(f'Necessario -> {processo.obterTempoNecessario()} | ', n='', t='')
+      self.console.mostrar(f'Processado -> {processo.obterProcessado()} | ', n='', t='')
+      self.console.mostrar(f'Faltando -> {faltando} | ', n='', t='')
+      self.console.mostrar(f'Status -> {processo.status()}', t='')
 
   def mostrarTabela(self):
     if self.totalDeFatias < 15:
@@ -89,31 +93,32 @@ class App(object):
     else:
       tamanhoDaFatia = 2 * ' '
     for processo in self.filaDeProcessos:
-      print(f'\t\t{processo.obterTitulo()} -> ', end='\033[0;0m')
+      self.console.mostrar(f'{processo.obterTitulo()} -> ', n='\033[0;0m')
       for estado in processo.obterHistorico():
-        print(f'|{self.cores[estado]}{tamanhoDaFatia}', end='\033[0;0m')
-      print('\n')
-    print('\n\n')
+        self.console.mostrar(f'|{self.cores[estado]}{tamanhoDaFatia}', n='\033[0;0m', t='')
+      self.console.quebraDeLinha(2)
 
   def mostrarResultados(self):
-    tempoMedioDeExecucao = 0
     tempoMedioDeEspera = 0
-    print('\n\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    tempoMedioDeExecucao = 0
     for processo in self.filaDeProcessos:
       tempoDeExecucao = len(processo.obterHistorico()) - processo.obterInicio()
       tempoDeEspera = tempoDeExecucao - processo.obterTempoNecessario()
       tempoMedioDeExecucao += tempoDeExecucao
       tempoMedioDeEspera += tempoDeEspera
-      print(f'\tResultados do processo {processo.obterTitulo()}')
-      print(f'\t  Tempo de execução -> {tempoDeExecucao}')
-      print(f'\t  Tempo de espera -> {tempoDeEspera}')
-      print('\t=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    tempoMedioDeExecucao /= len(self.filaDeProcessos)
+      self.console.quebraDeLinha(2)
+      self.console.mostrar(f'Resultados do processo {processo.obterTitulo()}')
+      self.console.linha(13)
+      self.console.mostrar(f'Tempo de espera -> {tempoDeEspera}')
+      self.console.mostrar(f'Tempo de execução -> {tempoDeExecucao}')
+      self.console.linha(13)
     tempoMedioDeEspera /= len(self.filaDeProcessos)
-    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    print(f'\tTempo médio de execução -> {tempoMedioDeExecucao :4} fatias')
-    print(f'\tTempo médio de espera   -> {tempoMedioDeEspera :4} fatias', end='')
-    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n')
+    tempoMedioDeExecucao /= len(self.filaDeProcessos)
+    self.console.quebraDeLinha(2)
+    self.console.linha(19)
+    self.console.mostrar(f'Tempo médio de espera   -> {tempoMedioDeEspera :4} fatias')
+    self.console.mostrar(f'Tempo médio de execução -> {tempoMedioDeExecucao :4} fatias')
+    self.console.linha(19)
 
 
 if __name__ == '__main__':

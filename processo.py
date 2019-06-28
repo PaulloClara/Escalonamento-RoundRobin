@@ -1,5 +1,9 @@
+from console import Console
+
+
 class Processo(object):
   def __init__(self):
+    self.__console = Console()
     self.__titulo = ''
     self.__inicio = 0
     self.__necessario = 0
@@ -46,10 +50,10 @@ class Processo(object):
     return self.__necessario
 
   def init(self):
-    print('\n\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
-    self.__titulo = input('\tTitulo do processo\n\t> ')
-    self.__inicio = int(input('\n\tEm qual tempo ele ira entrar na memoria?\n\t> '))
-    self.__necessario = int(input('\n\tTempo necessario\n\t> '))
-    print('\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
+    self.__console.linha(21)
+    self.__titulo = self.__console.obter('Titulo do processo')
+    self.__inicio = self.__console.obter('Em qual tempo ele ira entrar na memoria?', tipo='int')
+    self.__necessario = self.__console.obter('Tempo necessario', tipo='int')
+    self.__console.linha(21)
     for fatia in range(self.__inicio):
       self.registrar('Não alocado')
