@@ -11,23 +11,24 @@ class Processo(object):
     self.ativo = False
     self.finalizado = False
     for fatia in range(self.inicio):
-      self.registrar('Não alocado')
+      self.registrar('nao alocado')
 
   def status(self):
-    msg = 'Pronto'
     if self.finalizado:
-      msg = 'Finalizado'
+      msg = 'finalizado'
     elif not self.ativo:
-      msg = 'Não Alocado'
+      msg = 'nao alocado'
+    else:
+      msg = 'pronto'
     return msg
 
   def run(self):
     self.processado += 1
-    self.registrar('Executando')
+    self.registrar('executando')
     if self.necessario - self.processado <= 0:
       self.finalizado = True
 
-  def registrar(self, estado='Finalizado'):
+  def registrar(self, estado='finalizado'):
     self.historico.append(estado)
 
   def entrarNaMemoria(self):
