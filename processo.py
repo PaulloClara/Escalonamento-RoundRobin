@@ -2,15 +2,16 @@ from console import Console
 
 
 class Processo(object):
-  def __init__(self):
-    self.__console = Console()
-    self.titulo = ''
-    self.inicio = 0
-    self.necessario = 0
+  def __init__(self, titulo, inicio, necessario):
+    self.titulo = titulo
+    self.inicio = inicio
+    self.necessario = necessario
     self.processado = 0
     self.historico = []
     self.ativo = False
     self.finalizado = False
+    for fatia in range(self.inicio):
+      self.registrar('Não alocado')
 
   def status(self):
     msg = 'Pronto'
@@ -31,12 +32,3 @@ class Processo(object):
 
   def entrarNaMemoria(self):
     self.ativo = True
-
-  def init(self, titulo):
-    self.__console.linha(21)
-    self.titulo = titulo
-    self.inicio = self.__console.obter('Em qual tempo ele ira entrar na memoria?', tipo='int')
-    self.necessario = self.__console.obter('Tempo necessario', tipo='int')
-    self.__console.linha(21)
-    for fatia in range(self.inicio):
-      self.registrar('Não alocado')
