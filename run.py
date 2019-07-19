@@ -66,9 +66,10 @@ class App(object):
       primeiroDaFila = self.filaDeExecucao[0]
       quantidadeDeFatiasGastasNaTrocaDeContexto = self.entradas.trocaDeContexto
       for fatia in range(quantidadeDeFatiasGastasNaTrocaDeContexto):
+        self.linhaDoTempo += 1
         primeiroDaFila.registrar('troca de contexto')
         self.registrar()
-      self.linhaDoTempo += quantidadeDeFatiasGastasNaTrocaDeContexto
+        self.verificarFilaDeExecucao()
 
   def verificarFilaDeExecucao(self):
     for processo in self.listaDeProcessos:
