@@ -25,33 +25,20 @@ class Entradas(object):
       }
 
   def processarManual(self):
-    """
-      def criarListaDeProcessos(self):
-        self.console.linha(21)
-        self.quantidadeDeProcessos = self.console.obter('Numero de processos', tipo='int')
-        self.console.linha(21)
-        for index in range(self.quantidadeDeProcessos):
-          self.console.quebraDeLinha(3)
-          self.console.linha(21)
-          titulo = self.console.obter(f'Titulo do Processo {index}')
-          processo = Processo()
-          processo.init(titulo)
-          self.totalDeFatias += processo.necessario
-          self.filaDeProcessos.append(processo)
-
-      def obterQuantum(self):
-        self.console.linha(21)
-        self.quantum = self.console.obter('Quanto vale o Quantum?', tipo='int')
-        self.console.linha(21)
-
-
-
-            self.__console.linha(21)
-            self.titulo = titulo
-            self.inicio = self.__console.obter('Em qual tempo ele ira entrar na memoria?', tipo='int')
-            self.necessario = self.__console.obter('Tempo necessario', tipo='int')
-            self.__console.linha(21)
-            for fatia in range(self.inicio):
-              self.registrar('Não alocado')
-
-    """
+    self.quantum = self.__console.obter('Quanto vale o quantum?', tipo='int')
+    self.trocaDeContexto = self.__console.obter('Quanto vale a troca de contexto?', tipo='int')
+    quantidadeDeProcessos = self.__console.obter('Quantidade de processos', tipo='int')
+    for i in range(quantidadeDeProcessos):
+      tituloDoProcesso = self.__console.obter(f'Titulo do processo {i+1}').upper()
+      self.tituloDosProcessos.append(tituloDoProcesso)
+    for i in range(quantidadeDeProcessos):
+      tituloDoProcesso = self.tituloDosProcessos[i]
+      self.__console.linha(22)
+      entradaNaMemoria = self.__console.obter(f'Em qual fatia de tempo "{tituloDoProcesso}" entra na memoria?', tipo='int')
+      tempoNecessario = self.__console.obter(f'Quantas fatias de tempo "{tituloDoProcesso}" irá precisar?', tipo='int', n=0)
+      self.__console.linha(22)
+      self.__console.quebraDeLinha(2)
+      self.dicionarioDeDicionariosDeProcessos[tituloDoProcesso] = {
+        'entrada': entradaNaMemoria,
+        'necessario': tempoNecessario
+      }

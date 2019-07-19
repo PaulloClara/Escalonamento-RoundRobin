@@ -18,7 +18,8 @@ class App(object):
     self.acao = ''
 
   def run(self):
-    tipoDeEntrada = self.console.obter()
+    tipoDeEntrada = self.console.obter('Tipo de entrada (Arquivo ou Manual)?')
+    self.console.quebraDeLinha(13)
     if ('arquivo' in tipoDeEntrada):
       self.entradas.processarArquivo()
     else:

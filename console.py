@@ -2,12 +2,13 @@ class Console(object):
   def __init__(self):
     pass
 
-  def obter(self, msg='', tipo=''):
+  def obter(self, msg='', tipo='', n=1):
     valor = ''
     while not valor:
       if msg:
-        valor = input(f'\t\t{msg}\n\t\t> ')
-        self.quebraDeLinha()
+        valor = input(f'\t{msg}\n\t> ')
+        if n:
+          self.quebraDeLinha(n)
       else:
         valor = input()
     if tipo == 'int':
