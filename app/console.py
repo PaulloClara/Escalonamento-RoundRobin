@@ -1,6 +1,6 @@
 class Console(object):
     def __init__(self):
-        pass
+        print('ola mundo')
 
     def obter(self, msg='', tipo='', n=1):
         valor = ''

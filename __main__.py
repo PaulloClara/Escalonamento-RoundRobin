@@ -1,9 +1,9 @@
 # Paulo Ricardo
 # Josivan Cardoso
 
-from console import Console
-from processo import Processo
-from entradas import Entradas
+from app.console import Console
+from app.processo import Processo
+from app.entradas import Entradas
 
 
 class App(object):

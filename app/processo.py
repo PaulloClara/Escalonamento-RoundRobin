@@ -1,6 +1,3 @@
-from console import Console
-
-
 class Processo(object):
     def __init__(self, titulo, inicio, necessario):
         self.titulo = titulo
