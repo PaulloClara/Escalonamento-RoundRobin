@@ -1,5 +1,8 @@
-# Paulo Ricardo
-# Josivan Cardoso
+"""
+    Paulo Ricardo
+    Josivan Cardoso
+"""
+
 from app import App
 
 

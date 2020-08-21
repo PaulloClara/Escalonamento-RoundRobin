@@ -5,8 +5,7 @@ from app.entradas import Entradas
 
 class App(object):
     def __init__(self):
-        self.console = Console()
-        self.entradas = Entradas(self.console)
+        self.entradas = Entradas()
         self.linhaDoTempo = 0
         self.fatiasDeTempoUsadas = 0
         self.totalDeFatiasDeTempoNecessarias = 0
@@ -15,9 +14,10 @@ class App(object):
         self.acao = ''
 
     def run(self):
-        tipoDeEntrada = self.console.obter(
-            'Tipo de entrada (Arquivo ou Manual)?')
-        self.console.quebraDeLinha(13)
+        tipoDeEntrada = Console.obter(
+            'Tipo de entrada (Arquivo ou Manual)?'
+        )
+        Console.quebrar_linha(vezes=13)
         if ('arquivo' in tipoDeEntrada):
             self.entradas.processarArquivo()
         else:
@@ -89,23 +89,23 @@ class App(object):
             self.listaDeProcessos.append(objetoProcesso)
 
     def mostrarExecucao(self):
-        self.console.quebraDeLinha(1)
+        Console.quebrar_linha(1)
         for i, processo in enumerate(self.filaDeExecucao):
             fatiasDeTempoFaltando = processo.necessario - processo.processado
-            self.console.mostrar(f'{i+1} -> {processo.titulo}', n=' | ')
-            self.console.mostrar(
+            Console.mostrar(f'{i+1} -> {processo.titulo}', n=' | ')
+            Console.mostrar(
                 f'Faltando -> {fatiasDeTempoFaltando}', n=' | ', t='')
-            self.console.mostrar(
+            Console.mostrar(
                 f'Processado -> {processo.processado}', n=' | ', t='')
-            self.console.mostrar(
+            Console.mostrar(
                 f'Necessario -> {processo.necessario}', n=' | ', t='')
             status = processo.status()
             if i == 0 and status != 'finalizado':
                 status = 'executou'
-            self.console.mostrar(f'Status -> {status}', t='')
+            Console.mostrar(f'Status -> {status}', t='')
 
     def mostrarTabela(self):
-        self.console.quebraDeLinha(2)
+        Console.quebrar_linha(2)
         cores = {
             'executando': '\033[1;41m',
             'pronto': '\033[1;42m',
@@ -119,12 +119,12 @@ class App(object):
         else:
             tamanhoDaFatia = 1 * ' '
         for processo in self.listaDeProcessos:
-            self.console.mostrar(
+            Console.mostrar(
                 f'{processo.titulo} -> ', n='\033[0;0m', t='   ')
             for estado in processo.historico:
-                self.console.mostrar(
+                Console.mostrar(
                     f'|{cores[estado]}{tamanhoDaFatia}', n='\033[0;0m', t='')
-            self.console.quebraDeLinha(2)
+            Console.quebrar_linha(2)
 
     def mostrarResultados(self):
         tempoMedioDeEspera = 0
@@ -135,19 +135,19 @@ class App(object):
             tempoDeEspera = tempoDeExecucao - processo.necessario
             tempoMedioDeExecucao += tempoDeExecucao
             tempoMedioDeEspera += tempoDeEspera
-            self.console.quebraDeLinha(2)
-            self.console.mostrar(f'Resultados do processo {processo.titulo}')
-            self.console.linha(13)
-            self.console.mostrar(f'Tempo de espera   -> {tempoDeEspera}')
-            self.console.mostrar(f'Tempo de execução -> {tempoDeExecucao}')
-            self.console.linha(13)
+            Console.quebrar_linha(2)
+            Console.mostrar(f'Resultados do processo {processo.titulo}')
+            Console.adicionar_separador(13)
+            Console.mostrar(f'Tempo de espera   -> {tempoDeEspera}')
+            Console.mostrar(f'Tempo de execução -> {tempoDeExecucao}')
+            Console.adicionar_separador(13)
         quantidadeDeProcessos = len(self.listaDeProcessos)
         tempoMedioDeEspera /= quantidadeDeProcessos
         tempoMedioDeExecucao /= quantidadeDeProcessos
-        self.console.quebraDeLinha(2)
-        self.console.linha(19)
-        self.console.mostrar(
+        Console.quebrar_linha(2)
+        Console.adicionar_separador(19)
+        Console.mostrar(
             f'Tempo médio de espera   -> {tempoMedioDeEspera :.4} fatias')
-        self.console.mostrar(
+        Console.mostrar(
             f'Tempo médio de execução -> {tempoMedioDeExecucao :.4} fatias')
-        self.console.linha(19)
+        Console.adicionar_separador(19)

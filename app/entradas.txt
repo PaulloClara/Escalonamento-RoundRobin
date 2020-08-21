@@ -1,0 +1,15 @@
+Tipo de Entrada: Arquivo
+Quantum: 2
+Troca de Contexto: 0
+
+Entra na Memoria
+A B C
+0 2 1
+
+Fatias Necessarias
+A B C
+24 3 4
+
+Tempo médio de espera   -> 6.0 fatias
+Tempo médio de execução -> 16.33 fatias
+Execução -> A2, C2, B2, A2, C2, B1, A20

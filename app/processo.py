@@ -12,12 +12,12 @@ class Processo(object):
 
     def status(self):
         if self.finalizado:
-            msg = 'finalizado'
+            mensagem = 'finalizado'
         elif not self.ativo:
-            msg = 'nao alocado'
+            mensagem = 'nao alocado'
         else:
-            msg = 'pronto'
-        return msg
+            mensagem = 'pronto'
+        return mensagem
 
     def run(self):
         self.processado += 1

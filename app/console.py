@@ -1,29 +1,27 @@
 class Console(object):
-    def __init__(self):
-        print('ola mundo')
-
-    def obter(self, msg='', tipo='', n=1):
+    @staticmethod
+    def obter(mensagem='', linhas=1):
         valor = ''
+
         while not valor:
-            if msg:
-                valor = input(f'\t{msg}\n\t> ')
-                if n:
-                    self.quebraDeLinha(n)
+            if mensagem:
+                valor = input(f'\t{mensagem}\n\t> ')
+
+                if linhas:
+                    Console.quebrar_linha(vezes=linhas)
             else:
                 valor = input()
-        if tipo == 'int':
-            return int(valor)
-        elif tipo == 'float':
-            return float(valor)
-        else:
-            return valor.lower().replace('  ', ' ').replace('   ', ' ')
 
-    def mostrar(self, msg, n='\n', t='\t'):
-        print(f'{t}{msg}', end=n)
+        return valor.lower()
 
-    def linha(self, quantidade):
-        resultado = '=-' * quantidade + '='
-        print(f'\t{resultado}')
+    @staticmethod
+    def mostrar(mensagem, n='\n', t='\t'):
+        print(f'{t}{mensagem}', end=n)
 
-    def quebraDeLinha(self, numeroDeLinhas=1):
-        print('\n' * (numeroDeLinhas-1))
+    @staticmethod
+    def adicionar_separador(tamanho):
+        print(f'\t{"=-" * tamanho}=')
+
+    @staticmethod
+    def quebrar_linha(vezes=1):
+        print('\n' * vezes, end='')
