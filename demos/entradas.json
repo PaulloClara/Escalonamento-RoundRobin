@@ -1,0 +1,26 @@
+{
+  "quantum": 3,
+  "contexto": 1,
+  "processos": [
+    {
+      "nome": "T1",
+      "inicio": 0,
+      "fatias": 5
+    },
+    {
+      "nome": "T2",
+      "inicio": 0,
+      "fatias": 2
+    },
+    {
+      "nome": "T3",
+      "inicio": 1,
+      "fatias": 4
+    },
+    {
+      "nome": "T4",
+      "inicio": 3,
+      "fatias": 3
+    }
+  ]
+}

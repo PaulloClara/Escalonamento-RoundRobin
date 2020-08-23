@@ -1,15 +1,18 @@
-### Para executar:
+# **Round Robin**
 
+> Algoritmo de escalonamento Round Robin desenvolvido durante a disciplina de Sistemas Operacionais no Instituto Federal do Piauí - IFPI.
+
+## Executar
+
+```bash
+# via console
+$ python3 -B . # ou python3 -B __main__.py
+# via arquivo json
+$ python3 -B . --arquivo caminho/ate/arquivo.json
 ```
-  python3 -B run.py
-        ou
-  python3 -B run.py < entradas.txt
-```
 
-### Demonstração:
+### Demonstração
 
-![alt text](https://uploaddeimagens.com.br/images/002/202/499/full/1.png?1563548330)
-
-![alt text](https://uploaddeimagens.com.br/images/002/202/504/full/2.png?1563548371)
-
-![alt text](https://uploaddeimagens.com.br/images/002/202/510/full/3.png?1563548487)
+![alt text](demos/github/demo1.png)
+![alt text](demos/github/demo2.png)
+![alt text](demos/github/demo3.png)

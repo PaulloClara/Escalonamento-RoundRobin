@@ -1,6 +1,5 @@
 --------------------------------------------------------------------------------
 
-Tipo de Entrada: Arquivo
 Quantum: 2
 Troca de Contexto: 0
 
@@ -18,7 +17,6 @@ Execução -> A2, C2, B2, A2, C2, B1, A20
 
 --------------------------------------------------------------------------------
 
-Tipo de Entrada: Arquivo
 Quantum: 2
 Troca de Contexto: 0
 
@@ -36,7 +34,6 @@ Execução -> T1 2, T2 2, T3 2, T1 2, T4 2, T3 2, T1 1, T4 1
 
 --------------------------------------------------------------------------------
 
-Tipo de Entrada: Arquivo
 Quantum: 2
 Troca de Contexto: 0
 
@@ -54,7 +51,6 @@ Execução -> A2, B2, C2, A2, E2, B2, D2, F2, C2, A2, E2, B1, D2, F2, A2, E3
 
 --------------------------------------------------------------------------------
 
-Tipo de Entrada: Arquivo
 Quantum: 6
 Troca de Contexto: 3
 

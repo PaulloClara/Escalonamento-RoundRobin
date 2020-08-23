@@ -1,153 +1,188 @@
 from app.console import Console
+from app.entrada import Entrada
 from app.processo import Processo
-from app.entradas import Entradas
+
+
+CORES = {
+    'pronto': '\033[1;42m',
+    'executando': '\033[1;41m',
+    'nao alocado': '\033[1;100m',
+    'troca de contexto': '\033[1;43m'
+}
 
 
 class App(object):
     def __init__(self):
-        self.entradas = Entradas()
-        self.linhaDoTempo = 0
-        self.fatiasDeTempoUsadas = 0
-        self.totalDeFatiasDeTempoNecessarias = 0
-        self.filaDeExecucao = []
-        self.listaDeProcessos = []
+        self.dados_de_entrada = Entrada()
+
+        self.fatias_usadas = 0
+        self.fatias_executadas = 0
+        self.total_de_fatias = 0
+
+        self.processos = []
+        self.fila_de_execucao = []
+
         self.acao = ''
 
     def run(self):
-        tipoDeEntrada = Console.obter(
-            'Tipo de entrada (Arquivo ou Manual)?'
-        )
-        Console.quebrar_linha(vezes=13)
-        if ('arquivo' in tipoDeEntrada):
-            self.entradas.processarArquivo()
-        else:
-            self.entradas.processarManual()
-        self.criarListaDeProcessos()
-        self.verificarFilaDeExecucao()
-        for fatiaDeTempo in range(self.totalDeFatiasDeTempoNecessarias):
+        self.dados_de_entrada.carregar()
+
+        self.criar_lista_de_processos()
+        self.verificar_fila_de_execucao()
+
+        for fatia_de_tempo in range(self.total_de_fatias):
             self.executar()
-            self.registrar()
-            self.verificarFilaDeExecucao()
-            fatiasDeTempoEsgotadas = self.fatiasDeTempoUsadas >= self.entradas.quantum
-            if self.acao == 'remover da fila de execucao' or fatiasDeTempoEsgotadas:
-                self.executarAcao()
-                self.fatiasDeTempoUsadas = 0
-        self.mostrarResultados()
-        self.mostrarTabela()
+            self.registrar_como_pronto()
+            self.verificar_fila_de_execucao()
+
+            quantum = self.dados_de_entrada.quantum
+            remover_da_fila = self.acao == 'remover da fila de execucao'
+
+            if remover_da_fila or self.fatias_usadas >= quantum:
+                self.executar_acao()
+                self.fatias_usadas = 0
+
+        self.mostrar_resultados()
+        self.mostrar_tabela()
 
     def executar(self):
-        primeiroDaFila = self.filaDeExecucao[0]
-        primeiroDaFila.run()
-        if primeiroDaFila.status() == 'pronto':
+        primeiro_da_fila = self.fila_de_execucao[0]
+        primeiro_da_fila.run()
+
+        if primeiro_da_fila.estado() == 'pronto':
             self.acao = 'mover para o fim da fila de execucao'
-        elif primeiroDaFila.status() == 'finalizado':
+        elif primeiro_da_fila.estado() == 'finalizado':
             self.acao = 'remover da fila de execucao'
         else:
-            return
-        self.linhaDoTempo += 1
-        self.fatiasDeTempoUsadas += 1
+            return None
 
-    def executarAcao(self):
-        self.mostrarExecucao()
-        primeiroDaFila = self.filaDeExecucao[0]
-        fazerTrocaDeContexto = False
-        tamanhoDaFilaDeExecucao = len(self.filaDeExecucao)
-        if tamanhoDaFilaDeExecucao > 1:
-            fazerTrocaDeContexto = True
+        self.fatias_usadas += 1
+        self.fatias_executadas += 1
+
+    def executar_acao(self):
+        self.mostrar_execucao()
+
+        primeiro_da_fila = self.fila_de_execucao[0]
+        fazer_troca_de_contexto = False
+
+        tamanho_da_fila = len(self.fila_de_execucao)
+        if tamanho_da_fila > 1:
+            fazer_troca_de_contexto = True
         if self.acao == 'mover para o fim da fila de execucao':
-            self.filaDeExecucao.append(primeiroDaFila)
-            self.filaDeExecucao.pop(0)
+            self.fila_de_execucao.append(primeiro_da_fila)
+            self.fila_de_execucao.pop(0)
         elif self.acao == 'remover da fila de execucao':
-            self.filaDeExecucao.pop(0)
+            self.fila_de_execucao.pop(0)
         else:
-            return
-        if fazerTrocaDeContexto:
-            primeiroDaFila = self.filaDeExecucao[0]
-            quantidadeDeFatiasGastasNaTrocaDeContexto = self.entradas.trocaDeContexto
-            for fatia in range(quantidadeDeFatiasGastasNaTrocaDeContexto):
-                self.linhaDoTempo += 1
-                primeiroDaFila.registrar('troca de contexto')
-                self.registrar()
-                self.verificarFilaDeExecucao()
+            return None
 
-    def verificarFilaDeExecucao(self):
-        for processo in self.listaDeProcessos:
-            if processo.status() == 'nao alocado' and self.linhaDoTempo >= processo.inicio:
-                processo.entrarNaMemoria()
-                self.filaDeExecucao.append(processo)
+        if fazer_troca_de_contexto:
+            primeiro_da_fila = self.fila_de_execucao[0]
+            fatias_gastas_na_troca_de_contexto = self.dados_de_entrada.contexto
 
-    def registrar(self, estado='pronto'):
-        for i in range(1, len(self.filaDeExecucao)):
-            self.filaDeExecucao[i].registrar(estado)
+            for fatia in range(fatias_gastas_na_troca_de_contexto):
+                self.fatias_executadas += 1
+                primeiro_da_fila.registrar(estado='troca de contexto')
 
-    def criarListaDeProcessos(self):
-        for tituloDoProcesso in self.entradas.tituloDosProcessos:
-            processo = self.entradas.dicionarioDeDicionariosDeProcessos[tituloDoProcesso]
-            objetoProcesso = Processo(
-                tituloDoProcesso, processo['entrada'], processo['necessario'])
-            self.totalDeFatiasDeTempoNecessarias += objetoProcesso.necessario
-            self.listaDeProcessos.append(objetoProcesso)
+                self.registrar_como_pronto()
+                self.verificar_fila_de_execucao()
 
-    def mostrarExecucao(self):
-        Console.quebrar_linha(1)
-        for i, processo in enumerate(self.filaDeExecucao):
-            fatiasDeTempoFaltando = processo.necessario - processo.processado
-            Console.mostrar(f'{i+1} -> {processo.titulo}', n=' | ')
+    def verificar_fila_de_execucao(self):
+        for processo in self.processos:
+            iniciar_processo = self.fatias_executadas >= processo.inicio
+
+            if processo.estado() == 'nao alocado' and iniciar_processo:
+                processo.entrar_na_memoria()
+                self.fila_de_execucao.append(processo)
+
+    def registrar_como_pronto(self, inicio=1):
+        for i in range(inicio, len(self.fila_de_execucao)):
+            self.fila_de_execucao[i].registrar('pronto')
+
+    def criar_lista_de_processos(self):
+        for dados_do_processo in self.dados_de_entrada.processos:
+            processo = Processo(dados_do_processo)
+
+            self.total_de_fatias += processo.fatias
+            self.processos.append(processo)
+
+    def mostrar_execucao(self):
+        def obter_espacos(valor):
+            return (2 - len(f'{valor}')) * ' '
+
+        Console.quebrar_linha(vezes=1)
+
+        for i, processo in enumerate(self.fila_de_execucao):
+            faltando = processo.fatias - processo.processado
+            n = ' | '
+
+            Console.mostrar(f'{i+1} -> {processo.nome}', n=n)
+
+            espacos = obter_espacos(faltando)
+            Console.mostrar(f'Faltando -> {espacos}{faltando}', n=n, t='')
+
+            espacos = obter_espacos(processo.processado)
             Console.mostrar(
-                f'Faltando -> {fatiasDeTempoFaltando}', n=' | ', t='')
-            Console.mostrar(
-                f'Processado -> {processo.processado}', n=' | ', t='')
-            Console.mostrar(
-                f'Necessario -> {processo.necessario}', n=' | ', t='')
-            status = processo.status()
-            if i == 0 and status != 'finalizado':
-                status = 'executou'
-            Console.mostrar(f'Status -> {status}', t='')
+                f'Processado -> {espacos}{processo.processado}', n=n, t='')
 
-    def mostrarTabela(self):
+            espacos = obter_espacos(processo.fatias)
+            Console.mostrar(
+                f'Necessario -> {espacos}{processo.fatias}', n=n, t='')
+
+            estado = processo.estado()
+            if i == 0 and estado != 'finalizado':
+                estado = 'executou'
+
+            Console.mostrar(f'Estado -> {estado}', t='')
+
+    def mostrar_tabela(self):
         Console.quebrar_linha(2)
-        cores = {
-            'executando': '\033[1;41m',
-            'pronto': '\033[1;42m',
-            'nao alocado': '\033[1;100m',
-            'troca de contexto': '\033[1;43m'
-        }
-        if self.linhaDoTempo < 27:
-            tamanhoDaFatia = 3 * ' '
-        elif self.linhaDoTempo < 43:
-            tamanhoDaFatia = 2 * ' '
+
+        n = '\033[0;0m'
+
+        if self.fatias_executadas < 27:
+            tamanho_da_fatia_em_tela = 3 * ' '
+        elif self.fatias_executadas < 43:
+            tamanho_da_fatia_em_tela = 2 * ' '
         else:
-            tamanhoDaFatia = 1 * ' '
-        for processo in self.listaDeProcessos:
-            Console.mostrar(
-                f'{processo.titulo} -> ', n='\033[0;0m', t='   ')
+            tamanho_da_fatia_em_tela = 1 * ' '
+
+        for processo in self.processos:
+            Console.mostrar(f'{processo.nome} -> ', n=n, t='   ')
+
             for estado in processo.historico:
-                Console.mostrar(
-                    f'|{cores[estado]}{tamanhoDaFatia}', n='\033[0;0m', t='')
+                representacao = f'{CORES[estado]}{tamanho_da_fatia_em_tela}'
+                Console.mostrar(f'|{representacao}', n=n, t='')
+
             Console.quebrar_linha(2)
 
-    def mostrarResultados(self):
-        tempoMedioDeEspera = 0
-        tempoMedioDeExecucao = 0
-        for processo in self.listaDeProcessos:
-            totalDeFatiasDeTempoUsadasParaFinalizar = len(processo.historico)
-            tempoDeExecucao = totalDeFatiasDeTempoUsadasParaFinalizar - processo.inicio
-            tempoDeEspera = tempoDeExecucao - processo.necessario
-            tempoMedioDeExecucao += tempoDeExecucao
-            tempoMedioDeEspera += tempoDeEspera
+    def mostrar_resultados(self):
+        media_de_espera = 0
+        media_em_memoria = 0
+
+        for processo in self.processos:
+            fatias_gastas = len(processo.historico)
+            fatias_gastas_em_memoria = fatias_gastas - processo.inicio
+            fatias_em_espera = fatias_gastas_em_memoria - processo.fatias
+
+            media_de_espera += fatias_em_espera
+            media_em_memoria += fatias_gastas_em_memoria
+
             Console.quebrar_linha(2)
-            Console.mostrar(f'Resultados do processo {processo.titulo}')
+            Console.mostrar(f'Resultados do processo {processo.nome}')
             Console.adicionar_separador(13)
-            Console.mostrar(f'Tempo de espera   -> {tempoDeEspera}')
-            Console.mostrar(f'Tempo de execução -> {tempoDeExecucao}')
+            Console.mostrar(f'Tempo de espera   -> {fatias_em_espera}')
+            Console.mostrar(f'Tempo de execução -> {fatias_gastas_em_memoria}')
             Console.adicionar_separador(13)
-        quantidadeDeProcessos = len(self.listaDeProcessos)
-        tempoMedioDeEspera /= quantidadeDeProcessos
-        tempoMedioDeExecucao /= quantidadeDeProcessos
+
+        quantidade_de_processos = len(self.processos)
+        media_de_espera /= quantidade_de_processos
+        media_em_memoria /= quantidade_de_processos
+
         Console.quebrar_linha(2)
         Console.adicionar_separador(19)
         Console.mostrar(
-            f'Tempo médio de espera   -> {tempoMedioDeEspera :.4} fatias')
+            f'Tempo médio de espera   -> {media_de_espera :.2f} fatias')
         Console.mostrar(
-            f'Tempo médio de execução -> {tempoMedioDeExecucao :.4} fatias')
+            f'Tempo médio de execução -> {media_em_memoria :.2f} fatias')
         Console.adicionar_separador(19)

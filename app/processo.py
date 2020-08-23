@@ -1,32 +1,37 @@
 class Processo(object):
-    def __init__(self, titulo, inicio, necessario):
-        self.titulo = titulo
-        self.inicio = inicio
-        self.necessario = necessario
-        self.processado = 0
+    def __init__(self, dados):
+        self.nome = dados['nome']
+        self.inicio = dados['inicio']
+        self.fatias = dados['fatias']
+
         self.historico = []
+        self.processado = 0
+
         self.ativo = False
         self.finalizado = False
-        for fatia in range(self.inicio):
-            self.registrar('nao alocado')
 
-    def status(self):
+        for fatia in range(self.inicio):
+            self.registrar(estado='nao alocado')
+
+    def run(self):
+        self.registrar('executando')
+        self.processado += 1
+
+        if self.fatias - self.processado <= 0:
+            self.finalizado = True
+
+    def estado(self):
         if self.finalizado:
             mensagem = 'finalizado'
         elif not self.ativo:
             mensagem = 'nao alocado'
         else:
             mensagem = 'pronto'
-        return mensagem
 
-    def run(self):
-        self.processado += 1
-        self.registrar('executando')
-        if self.necessario - self.processado <= 0:
-            self.finalizado = True
+        return mensagem
 
     def registrar(self, estado='finalizado'):
         self.historico.append(estado)
 
-    def entrarNaMemoria(self):
+    def entrar_na_memoria(self):
         self.ativo = True
